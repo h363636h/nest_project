@@ -1,36 +1,51 @@
-import { Controller, Get, Post, Param, HttpCode  } from '@nestjs/common';
+import { Controller, Get, Post, Param, HttpCode, Body, ValidationPipe, ParseIntPipe  } from '@nestjs/common';
 import { FruitService } from './fruit.service';
+import { Result as FruitResult } from './result/result.interface';
+import {Supply} from './dto/supply';
 
 @Controller('fruit')
 export class FruitController {
 	constructor(private fruitService: FruitService) {}
 	@Get('/')
-	getFruit(): object {
+	getFruit(): FruitResult {
 	  return { msg: this.fruitService.chk(), remain: this.fruitService.count };
 	}	
 	@Post('/buy')
 	@HttpCode(201)
-	buyFruit(): object {
+	buyFruit(): FruitResult {
 	  return { msg: this.fruitService.buy(1), remain: this.fruitService.count };
 	}
 	@Post('/buy/:count')
 	@HttpCode(201)
-	buyFruits(@Param('count') count: string): object {
+	buyFruits(@Param('count', ParseIntPipe) count: number): FruitResult {
 	  return {
-		msg: this.fruitService.buy(parseInt(count, 10)),
+		msg: this.fruitService.buy(count),
 		remain: this.fruitService.count,
 	  };
 	}
 	@Get('/eat')
-	async eatFruit(): Promise<object> {
+	async eatFruit(): Promise<FruitResult> {
 	  return { msg: this.fruitService.eat(1), remain: this.fruitService.count };
 	}
   
 	@Get('/eat/:count')
-	eatFruits(@Param('count') count: string): object {
+	eatFruits(@Param('count') count: string): FruitResult {
 	  return {
 		msg: this.fruitService.eat(parseInt(count, 10)),
 		remain: this.fruitService.count,
 	  };
+	}
+
+	@Post('/supply')
+	@HttpCode(201)
+	supplyFruits(@Body(ValidationPipe) supplyDto: Supply): FruitResult {
+
+		return {
+			msg : 
+			this.fruitService.buy(
+				supplyDto.box * supplyDto.pcs + (supplyDto.bonus ?? 0),
+			) + (supplyDto.msg ?? ''),
+			remain:this.fruitService.count,
+		};
 	}
 }
