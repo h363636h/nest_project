@@ -6,10 +6,17 @@ import {Supply} from './dto/supply';
 @Controller('fruit')
 export class FruitController {
 	constructor(private fruitService: FruitService) {}
+	// ✴️수정
 	@Get('/')
-	getFruit(): FruitResult {
-	  return { msg: this.fruitService.chk(), remain: this.fruitService.count };
-	}	
+	async getFruit(): Promise<FruitResult> {
+		const res = await this.fruitService.chk();
+		return {
+		msg: res,
+		remain: this.fruitService.count,
+		};
+	}
+	// ✴️수정 끝 
+
 	@Post('/buy')
 	@HttpCode(201)
 	buyFruit(): FruitResult {
@@ -42,9 +49,7 @@ export class FruitController {
 
 		return {
 			msg : 
-			this.fruitService.buy(
-				supplyDto.box * supplyDto.pcs + (supplyDto.bonus ?? 0),
-			) + (supplyDto.msg ?? ''),
+			this.fruitService.buy(3),
 			remain:this.fruitService.count,
 		};
 	}
