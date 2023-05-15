@@ -1,26 +1,27 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
-      transform : true,
-    })
-  )
-
-    // ✴️추가 시작
- const config = new DocumentBuilder()
- .setTitle('Fruit API Documentation')
- .setDescription('과일 프로젝트의 API 문서입니다')
- .setVersion('1.0')
- .addTag('fruit')
- .build();
-  const document = SwaggerModule.createDocument(app, config);
+      transform: true,
+    }),
+  );
+  const swagger_config = new DocumentBuilder()
+    .setTitle('Rand Mall')
+    .setDescription('Rand Mall API Documents')
+    .setVersion('1.0.0')
+    .addTag('Rand Mall')
+    .build();
+  // config를 바탕으로 swagger document 생성
+  const document = SwaggerModule.createDocument(app, swagger_config);
+  // Swagger UI에 대한 path를 연결함
+  // .setup('swagger ui endpoint', app, swagger_document)
   SwaggerModule.setup('api', app, document);
-  // ✴️추가 
-  await app.listen(3000);
+
+  await app.listen(5000);
 }
 bootstrap();

@@ -1,11 +1,14 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { FruitModule } from './fruit/fruit.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DBConfigProvider } from './database/DBConfigProvider';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { UserModule } from './user/user.module';
+import { BoardModule } from './board/board.module';
+import { PointModule } from './point/point.module';
+import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -14,14 +17,13 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
       envFilePath: ['.env.development', '.env'],
     }),
     TypeOrmModule.forRoot(DBConfigProvider.forRoot()),
-    FruitModule,
+    UserModule,
+    BoardModule,
+    PointModule,
+    ProductModule,
+    OrderModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
-
+export class AppModule {}

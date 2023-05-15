@@ -46,7 +46,6 @@ export class FruitController {
 	@Post('/supply')
 	@HttpCode(201)
 	supplyFruits(@Body(ValidationPipe) supplyDto: Supply): FruitResult {
-
 		return {
 			msg : 
 			this.fruitService.buy(3),

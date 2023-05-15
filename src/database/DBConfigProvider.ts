@@ -13,9 +13,8 @@ export class DBConfigProvider {
       entities: [__dirname + '/entities/*.js'],
       logging: true,
     };
-    console.log(__dirname);
-    console.log(process.env.IS_REAL);
-    console.log(result);
+    //console.log(process.env.IS_REAL);
+    //console.log(result);
     return result;
   }
 }
