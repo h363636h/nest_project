@@ -1,11 +1,14 @@
-import { YesOrNo } from 'src/board/enum/board.enum';
+import { YesOrNo } from 'src/common/enum/common.enum';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class Board {
@@ -15,20 +18,10 @@ export class Board {
   b_id: number;
 
   @Column({
-    unsigned: true,
-    default: 0,
-  })
-  b_sub_id: number;
-
-  @Column({
+    length: 200,
     default: '',
   })
   b_title: string;
-
-  @Column({
-    default: '',
-  })
-  b_writer: string;
 
   @Column({
     type: 'text',
@@ -60,15 +53,15 @@ export class Board {
 
   @Column({
     type: 'enum',
-    default: 'N',
-    enum: ['Y', 'N'],
+    default: YesOrNo.N,
+    enum: YesOrNo,
   })
   b_is_lock: YesOrNo;
 
   @Column({
     type: 'enum',
-    default: 'Y',
-    enum: ['Y', 'N'],
+    default: YesOrNo.Y,
+    enum: YesOrNo,
   })
   b_is_view: YesOrNo;
 
@@ -77,4 +70,26 @@ export class Board {
 
   @UpdateDateColumn()
   b_mod_date: Date;
+
+  @ManyToOne(() => User, (user) => user.u_id, { nullable: true })
+  @JoinColumn({ name: 'b_writer', referencedColumnName: 'u_id' })
+  user: User;
+
+  static fromBoardEntity(
+    title: string,
+    content: string,
+    writer: User,
+    is_lock: YesOrNo,
+    is_view: YesOrNo,
+    passwd: string,
+  ) {
+    const board = new Board();
+    board.b_title = title;
+    board.user = writer;
+    board.b_content = content;
+    board.b_is_lock = is_lock;
+    board.b_is_view = is_view;
+    board.b_passwd = passwd;
+    return board;
+  }
 }

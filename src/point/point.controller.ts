@@ -1,42 +1,34 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
+  UseGuards,
+  Request,
+  Get,
 } from '@nestjs/common';
 import { PointService } from './point.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 import { CreatePointDto } from './dto/create-point.dto';
-import { UpdatePointDto } from './dto/update-point.dto';
 
+@ApiTags('Point API')
 @Controller('point')
 export class PointController {
   constructor(private readonly pointService: PointService) {}
 
-  @Post()
-  create(@Body() createPointDto: CreatePointDto) {
-    return this.pointService.create(createPointDto);
-  }
-
   @Get()
-  findAll() {
-    return this.pointService.findAll();
+  @ApiOperation({ summary: '내 포인트 조회' })
+  @ApiBearerAuth() // Bearer Token 인증 설정
+  @UseGuards(AuthGuard('myGuard'))
+  getMyPointList(@Request() req) {
+    return this.pointService.get_my_point_list({ auth: req.user });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pointService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePointDto: UpdatePointDto) {
-    return this.pointService.update(+id, updatePointDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pointService.remove(+id);
+  @Post()
+  @ApiOperation({ summary: '포인트 지급' })
+  @ApiBearerAuth() // Bearer Token 인증 설정
+  @UseGuards(AuthGuard('myGuard'))
+  create(@Body() body: CreatePointDto, @Request() req) {
+    return this.pointService.add_point({ _user: req.user, body });
   }
 }

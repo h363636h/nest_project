@@ -8,7 +8,9 @@ import { UserModule } from './user/user.module';
 import { BoardModule } from './board/board.module';
 import { PointModule } from './point/point.module';
 import { ProductModule } from './product/product.module';
-import { OrderModule } from './order/order.module';
+import { AuthModule } from './auth/auth.module';
+import { CommentModule } from './comment/comment.module';
+import { ProductCategoryModule } from './product_category/productCategory.module';
 
 @Module({
   imports: [
@@ -18,10 +20,12 @@ import { OrderModule } from './order/order.module';
     }),
     TypeOrmModule.forRoot(DBConfigProvider.forRoot()),
     UserModule,
-    BoardModule,
+    AuthModule,
     PointModule,
+    BoardModule,
+    CommentModule,
     ProductModule,
-    OrderModule
+    ProductCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,56 +1,61 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsString, IsOptional, IsEnum } from 'class-validator';
-
-enum ProductStatus {
-  Y = 'Y',
-  N = 'N',
-}
+import {
+  IsNumber,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsNumberString,
+  IsObject,
+} from 'class-validator';
+import { YesOrNo } from '../../common/enum/common.enum';
+import { UpdateProductCategoryDto } from 'src/product_category/dto/update-productCategory.dto';
 
 export class UpdateProductDto {
-  p_uid: number;
-
   @ApiProperty()
   @IsString()
   @IsOptional()
   p_name?: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   p_category?: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   p_price?: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   p_reserve?: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   p_point?: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   p_stock?: number;
 
-  @ApiProperty({ enum: ['Y', 'N'] })
-  @IsEnum(ProductStatus)
+  @ApiProperty({ enum: YesOrNo })
+  @IsEnum(YesOrNo)
   @IsOptional()
-  p_soldout: ProductStatus;
+  p_soldout?: keyof typeof YesOrNo;
 
-  @ApiProperty()
-  @IsString()
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    description: '파일',
+  })
   @IsOptional()
   p_image?: string;
 
-  @ApiProperty({ enum: ['Y', 'N'] })
-  @IsEnum(ProductStatus)
+  @ApiProperty({ enum: YesOrNo })
+  @IsEnum(YesOrNo)
   @IsOptional()
-  p_status: ProductStatus;
+  p_status: keyof typeof YesOrNo;
 }

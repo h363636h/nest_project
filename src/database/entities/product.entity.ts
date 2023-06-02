@@ -4,11 +4,17 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
+import { ProductCategory } from './productCategory.entity';
 
 @Entity()
 export class Product {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn({
+    unsigned: true,
+  })
   p_uid: number;
 
   @Column({ length: 255 })
@@ -16,6 +22,9 @@ export class Product {
 
   @Column({ type: 'int', default: 0 })
   p_category: number;
+
+  @Column({ type: 'text', default: 0 })
+  p_content: string;
 
   @Column({ type: 'int', default: 0 })
   p_price: number;
@@ -43,4 +52,8 @@ export class Product {
 
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   p_moddate: Date;
+
+  // N(상품) : 1 (카테고리)
+  @ManyToOne(() => ProductCategory)
+  productCategory: ProductCategory;
 }

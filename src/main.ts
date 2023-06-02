@@ -10,11 +10,14 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  const cors = require('cors');
+  app.use(cors());
   const swagger_config = new DocumentBuilder()
     .setTitle('Rand Mall')
     .setDescription('Rand Mall API Documents')
-    .setVersion('1.0.0')
+    .setVersion('3.0.0')
     .addTag('Rand Mall')
+    .addBearerAuth()
     .build();
   // config를 바탕으로 swagger document 생성
   const document = SwaggerModule.createDocument(app, swagger_config);
@@ -22,6 +25,6 @@ async function bootstrap() {
   // .setup('swagger ui endpoint', app, swagger_document)
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(5000);
+  await app.listen(7200);
 }
 bootstrap();

@@ -9,17 +9,35 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from 'src/database/entities/product.entity';
+import { ProductCategory } from 'src/database/entities/productCategory.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(ProductCategory)
+    private readonly productCategoryRepository: Repository<ProductCategory>,
   ) {}
 
   // 상품 등록
   async create(input: CreateProductDto): Promise<Product> {
     try {
+      const category_uid = Number(input.p_category);
+
+      // 1. 카테고리 uid 존재하는지 체크
+      const getCategoryData = await this.productCategoryRepository.findOne({
+        where: { pc_uid: category_uid },
+      });
+
+      // 카테고리 uid 없을 경우
+      if (!getCategoryData) {
+        throw new NotFoundException(
+          `Not Found ProductCategory uid =>  ${category_uid}`,
+        );
+      }
+
+      // 2. 상품 등록 처리
       const result = await this.productRepository.save({
         ...input,
       });
@@ -39,21 +57,43 @@ export class ProductService {
   }
   // 상품 수정
   async modify(p_uid: number, input: UpdateProductDto): Promise<Product> {
-    await this.productRepository.update({ p_uid: p_uid }, { ...input });
+    // update : 두개의 객체 인수로 받음 , 첫번째 : where절 / 두번째 : 갱신시킬 object
+    // 실패 여부만 return, 결과값 반환 x
+    //await this.productRepository.save({ p_uid: p_uid }, { ...input });
+
+    // 1. 상품 uid 존재하는지 체크
     const updatedProduct = this.findOne(p_uid);
     if (!updatedProduct) {
-      throw new NotFoundException(`can't find id ${p_uid}`);
+      throw new NotFoundException(`Not Found Product uid => ${p_uid}`);
     }
-    return updatedProduct;
+    const category_uid = Number(input.p_category);
+    
+    // 2. 카테고리 uid 존재하는지 체크
+    const getCategoryData = await this.productCategoryRepository.findOne({
+      where: { pc_uid: category_uid },
+    });
+
+    // 카테고리 uid 없을 경우
+    if (!getCategoryData) {
+      throw new NotFoundException(
+        `Not Found ProductCategory uid =>  ${category_uid}`,
+      );
+    }
+
+    // 3. 업데이트 처리
+    const newProduct = {
+      ...updatedProduct,
+      ...input,
+    };
+    const result = await this.productRepository.save(newProduct);
+
+    return result;
   }
 
   // 상품 삭제
   async delete(id: number): Promise<Product> {
     const product = await this.findOne(id);
     const result = await this.productRepository.remove(product);
-
-    // 소프트 삭제 (deleteAt 여부 판단) : 실제 데이터 삭제 x, select 시 deleteAt 필드 확인 후 select함
-    //const result = await this.productRepository.softRemove({p_uid : id});
     return result;
   }
 

@@ -1,42 +1,66 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { YesOrNo } from '../enum/board.enum';
+import { Board } from 'src/database/entities/board.entity';
+import { User } from 'src/database/entities/user.entity';
+import { YesOrNo } from '../../common/enum/common.enum';
 
 export class CreateBoardDto {
-  @ApiProperty()
-  b_sub_id: number;
-
-  @ApiProperty()
+  @ApiProperty({ description: '제목' })
   @IsString()
-  b_title: string;
+  private b_title: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
+  @ApiProperty({ description: '작성자 id' })
   @IsString()
-  b_writer: string;
+  private b_writer: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: '본문' })
   @IsString()
-  b_content: string;
+  private b_content: string;
 
   @ApiPropertyOptional({
-    type: 'string',
-    format: 'binary',
-    description: '파일',
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    },
+    description: '첨부 파일',
   })
   @IsOptional()
-  b_file: Express.Multer.File;
+  private b_file: Express.Multer.File[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: '잠금 비밀번호' })
   @IsOptional()
   @IsString()
-  b_passwd: string;
+  private b_passwd: string;
 
-  @ApiProperty({ enum: ['Y', 'N'] })
+  @ApiProperty({
+    enum: YesOrNo,
+    default: YesOrNo.N,
+    description: '잠금여부 (Y:잠금, N:공개)',
+  })
   @IsEnum(YesOrNo)
-  b_is_lock: YesOrNo;
+  private b_is_lock: YesOrNo;
 
-  @ApiProperty({ enum: ['Y', 'N'] })
+  @ApiProperty({
+    enum: YesOrNo,
+    default: YesOrNo.Y,
+    description: '노출여부 (Y:노출, N:미노출)',
+  })
   @IsEnum(YesOrNo)
-  b_is_view: YesOrNo;
+  private b_is_view: YesOrNo;
+
+  getB_writer() {
+    return this.b_writer;
+  }
+
+  toBoardEntity(user: User) {
+    return Board.fromBoardEntity(
+      this.b_title,
+      this.b_content,
+      user,
+      this.b_is_lock,
+      this.b_is_view,
+      this.b_passwd,
+    );
+  }
 }

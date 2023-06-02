@@ -1,48 +1,45 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsString, IsEnum } from 'class-validator';
-
-enum ProductStatus {
-  Y = 'Y',
-  N = 'N',
-}
+import { IsString, IsEnum, IsNumberString, IsObject } from 'class-validator';
+import { YesOrNo } from '../../common/enum/common.enum';
+import { CreateProductCategoryDto } from 'src/product_category/dto/create-productCategroy.dto';
 
 export class CreateProductDto {
-  @ApiProperty()
-  p_uid: number;
-
   @ApiProperty()
   @IsString()
   p_name: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   p_category: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   p_price: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   p_reserve: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   p_point: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumberString()
   p_stock: number;
 
-  @ApiProperty({ enum: ['Y', 'N'] })
-  @IsEnum(ProductStatus)
-  p_soldout: ProductStatus;
+  @ApiProperty({ enum: YesOrNo })
+  @IsEnum(YesOrNo)
+  p_soldout: keyof typeof YesOrNo;
 
-  @ApiProperty()
-  @IsString()
-  p_image: string;
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    description: '파일',
+  })
+  p_image: any;
 
-  @ApiProperty({ enum: ['Y', 'N'] })
-  @IsEnum(ProductStatus)
-  p_status: ProductStatus;
+  @ApiProperty({ enum: YesOrNo })
+  @IsEnum(YesOrNo)
+  p_status: keyof typeof YesOrNo;
 }
